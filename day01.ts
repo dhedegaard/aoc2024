@@ -18,11 +18,12 @@ const [firstList, lastList] = lines.reduce<[number[], number[]]>(
 );
 
 {
+  console.time("part1");
   let result = 0;
-  while (firstList.length > 0 && lastList.length > 0) {
+  for (let i = 0; i < firstList.length; i++) {
     result += Math.abs(
-      z.int().parse(firstList.pop()) - z.int().parse(lastList.pop())
+      z.int().parse(firstList[i]) - z.int().parse(lastList[i])
     );
   }
-  console.log("Part 1:", result);
+  console.timeLog("part1", result);
 }
