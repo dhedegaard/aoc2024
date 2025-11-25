@@ -1,7 +1,7 @@
 import z from 'zod'
 
 console.time('parse')
-const lines = await Bun.stdin
+const lines: readonly (readonly number[])[] = await Bun.stdin
   .text()
   .then((text) =>
     text
@@ -10,12 +10,13 @@ const lines = await Bun.stdin
   )
 console.timeEnd('parse')
 
-console.time('part1')
-const result = lines.reduce<number>((result, numbers) => {
+function checkValid(
+  numbers: readonly number[]
+): { valid: true } | { valid: false; failedIndex: number } {
   let levelType: 'increasing' | 'decreasing' | null = null
-  for (let i = 1; i < numbers.length; i++) {
-    const previous = numbers[i - 1]
-    const current = numbers[i]
+  for (let index = 1; index < numbers.length; index++) {
+    const previous = numbers[index - 1]
+    const current = numbers[index]
     if (previous == null || current == null) {
       throw new Error('Unexpected null value')
     }
@@ -26,13 +27,36 @@ const result = lines.reduce<number>((result, numbers) => {
       (levelType === 'increasing' && current < previous) ||
       (levelType === 'decreasing' && current > previous)
     ) {
-      return result
+      return { valid: false, failedIndex: index }
     }
     const diff = Math.abs(previous - current)
     if (diff < 1 || diff > 3) {
-      return result
+      return { valid: false, failedIndex: index }
     }
   }
-  return result + 1
+  return { valid: true }
+}
+
+{
+  console.time('part1')
+  const result = lines.reduce<number>(
+    (result, numbers) => (checkValid(numbers).valid ? result + 1 : result),
+    0
+  )
+  console.timeLog('part1', result)
+}
+
+console.time('part2')
+
+const result = lines.reduce<number>((result, numbers) => {
+  const firstResult = checkValid(numbers)
+  if (firstResult.valid) {
+    return result + 1
+  }
+  const secondResult = checkValid(numbers.toSpliced(firstResult.failedIndex, 1))
+  if (secondResult.valid) {
+    return result + 1
+  }
+  return result
 }, 0)
-console.timeLog('part1', result)
+console.timeLog('part2', result)

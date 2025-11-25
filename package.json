@@ -2,6 +2,8 @@
   "name": "aoc2024",
   "private": true,
   "devDependencies": {
+    "@tsconfig/bun": "^1.0.10",
+    "@tsconfig/strictest": "^2.0.8",
     "@types/bun": "latest"
   },
   "peerDependencies": {
